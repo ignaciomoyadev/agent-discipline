@@ -11,6 +11,7 @@
 set -e
 mkdir -p .cursor/agents .cursor/rules .cursor/skills/token-discipline
 
+
 cat > .cursor/agents/scout.md <<'CURSOR_EOF'
 ---
 name: scout
@@ -516,14 +517,30 @@ Ask two questions about any unit of work:
    Locating a symbol needs none. Diagnosing a race needs a lot. Paying the top
    tier for a `grep` is the most common waste in an agent system.
 
-| Work | Agent | Model tier |
-|---|---|---|
-| Locate files, symbols, callers, prior art | `scout` | `effort=low` |
-| Read external docs, confirm versions and APIs | `researcher` | `effort=medium` |
-| Implement a settled design | `builder` | `effort=high, fast` |
-| Hard bug, tangled refactor, a cheap pass already failed | `surgeon` | `effort=xhigh, fast` |
-| Adversarially verify work that matters | `auditor` | `effort=xhigh` |
-| Compress a long transcript or dump | `scribe` | `composer-2.5` |
+| Work | Agent | Model | Mode |
+|---|---|---|---|
+| Locate files, symbols, callers, prior art | `scout` | `composer-2.5` | foreground |
+| Sweep a codebase for defects | `hunter` | `composer-2.5` | background |
+| Read external docs, confirm versions and APIs | `researcher` | `grok-4.6[medium]` | background |
+| Implement a settled design | `builder` | `composer-2.5` | foreground |
+| Annotate doubt on work that matters | `auditor` | `composer-2.5` | foreground |
+| Compress a long transcript or dump | `scribe` | `composer-2.5` | background |
+| Hard bug where a cheap pass already failed | `surgeon` | `grok-4.6[xhigh]` | foreground |
+
+## Do not chain an agent that already opens files
+
+`hunter`, `builder`, `auditor` and `surgeon` read the workspace themselves. Sending
+`scout` ahead of them is a call you pay for and nobody uses.
+
+`scout` answers "where is X". It earns its place when **you** need coordinates to
+decide what to do next — not as a warm-up for an agent whose own first
+instruction is to read every relevant file.
+
+The same logic runs the other way: do not ask `scout` for an exhaustive
+inventory. It is capped at 15 rows and built to locate, not to enumerate.
+Observed on a real addon: asked for a model's location *and* all its computed
+fields, it nailed the location and listed the fields of one model only. That is
+the role working as written, not failing.
 
 Escalate on evidence, never on suspicion. Send `scout` first; promote to
 `surgeon` when the cheap pass returns something genuinely knotty. A `surgeon`
