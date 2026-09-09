@@ -1,0 +1,15 @@
+﻿{
+  "_comment": "Installed by install.ps1 for windows. Paths resolve from ~/.cursor/. Re-run install.ps1 -Uninstall to remove.",
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      { "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./hooks/guard-shell.ps1", "timeout": 5000, "failClosed": true }
+    ],
+    "beforeReadFile": [
+      { "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./hooks/guard-read.ps1", "timeout": 5000, "failClosed": true }
+    ],
+    "afterFileEdit": [
+      { "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./hooks/post-edit.ps1", "timeout": 20000 }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "agent-discipline",
+  "displayName": "Agent Discipline",
+  "version": "1.0.0",
+  "description": "Output contract, a delegated agent fleet pinned by cost tier, and routing guidance. Every claim in it was measured, not assumed.",
+  "author": { "name": "Ignacio Moya" },
+  "license": "MIT",
+  "category": "developer-tools",
+  "keywords": ["harness", "subagents", "token-economics", "output-contract", "routing"],
+  "rules": "./rules/",
+  "agents": "./agents/",
+  "skills": "./skills/"
+}

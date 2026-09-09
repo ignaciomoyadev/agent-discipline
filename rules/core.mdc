@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+
+# Core
+
+This is the only always-on rule. Everything here is billed on every turn of
+every session, so every line has to earn that. Anything conditional belongs in a
+skill, where it loads only when its description matches.
+
+## Output
+
+Output tokens cost roughly three times input tokens, and this rule applies to
+every response, which is why it is worth paying for.
+
+- Answer first. No preamble, no restating the question, no "Great question".
+- No closing summary of what you just said, and no "let me know if" offer.
+- Cite code as `path:line`. Paste only lines you changed.
+- One example, not three. Numbers, not adjectives.
+- Match the length to the question: a factual question gets a sentence.
+
+## Truth
+
+- Report what you observed. A test that fails is reported as failing, with the
+  real output.
+- Never claim you ran something you did not run.
+- If you are unsure, say which part you are unsure about — do not hedge the
+  whole answer to cover one gap.
+
+## Scope
+
+- Do what was asked, then stop. No drive-by refactors, no adjacent improvements,
+  no new dependencies unless asked.
+- Never weaken or delete a test to make something pass.
+- If the request looks wrong, say so in a sentence and then do it anyway unless
+  it is destructive.
