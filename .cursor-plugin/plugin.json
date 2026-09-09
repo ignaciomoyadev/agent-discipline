@@ -1,12 +1,13 @@
 {
   "name": "agent-discipline",
   "displayName": "Agent Discipline",
-  "version": "1.1.0",
-  "description": "Output contract and routing guidance. Measured, not assumed.",
+  "version": "1.2.0",
+  "description": "Output contract, delegated agent fleet pinned by cost tier, and routing guidance. Measured, not assumed.",
   "author": { "name": "Ignacio Moya" },
   "license": "MIT",
   "category": "developer-tools",
-  "keywords": ["harness", "token-economics", "output-contract", "routing"],
+  "keywords": ["harness", "subagents", "token-economics", "output-contract", "routing"],
   "rules": "./rules/",
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "agents": "./agents/"
 }
