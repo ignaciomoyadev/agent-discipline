@@ -35,3 +35,12 @@ same model, same effort, roughly 6x the price.
 Add `"agents": "./agents/"` to `plugin.json`. Re-verify with a canary first —
 one throwaway agent pinned to a model you are not running, asked to report what
 it is. If it reports its pin rather than your session, the fix landed.
+
+## Re-verified after a full restart (2026-09-09)
+
+The first canary runs were made without restarting Cursor, so a stale agent
+registry was a plausible alternative explanation. It was tested and ruled out:
+`agents` was declared in the manifest, Cursor was fully restarted, and a canary
+pinned to `glm-5.2-high` still reported **Cursor Grok 4.6** — the session model.
+
+The pin is genuinely ignored for plugin-provided agents. Not a caching artefact.
