@@ -1,0 +1,13 @@
+# Shell scripts must keep LF endings. A shebang ending in \r is not a valid
+# interpreter path on Linux, so the script fails to start -- and with
+# failClosed: true a hook that fails to start blocks every shell command and
+# every file read on that machine. That is the whole reason this file exists.
+*.sh text eol=lf
+
+# Read by tooling on both platforms; keep them LF everywhere.
+*.md   text eol=lf
+*.mdc  text eol=lf
+*.json text eol=lf
+
+# PowerShell only ever runs on Windows.
+*.ps1 text eol=crlf
