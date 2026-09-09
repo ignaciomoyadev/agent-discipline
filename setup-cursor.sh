@@ -542,10 +542,15 @@ Observed on a real addon: asked for a model's location *and* all its computed
 fields, it nailed the location and listed the fields of one model only. That is
 the role working as written, not failing.
 
-Escalate on evidence, never on suspicion. Send `scout` first; promote to
-`surgeon` when the cheap pass returns something genuinely knotty. A `surgeon`
-run that a `scout` could have answered costs roughly an order of magnitude more
-for the same answer.
+## Escalate on evidence, never on suspicion
+
+Reach for `surgeon` only after a cheaper pass has actually failed or returned
+something genuinely knotty. A `surgeon` run that a `scout` could have answered
+costs roughly an order of magnitude more for the same answer.
+
+This is about *sequencing after a result*, not about chaining agents up front.
+Escalation is a decision you take once the cheap tier reports back; the section
+above is about not paying for a step nobody consumes.
 
 ## Keep the prefix stable
 
