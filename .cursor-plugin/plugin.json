@@ -3,10 +3,18 @@
   "displayName": "Agent Discipline",
   "version": "1.3.0",
   "description": "Output contract and routing guidance, plus the agent fleet as source. Measured, not assumed.",
-  "author": { "name": "Ignacio Moya" },
+  "author": {
+    "name": "Ignacio Moya"
+  },
   "license": "MIT",
   "category": "developer-tools",
-  "keywords": ["harness", "subagents", "token-economics", "output-contract", "routing"],
+  "keywords": [
+    "harness",
+    "subagents",
+    "token-economics",
+    "output-contract",
+    "routing"
+  ],
   "rules": "./rules/",
   "skills": "./skills/"
 }
