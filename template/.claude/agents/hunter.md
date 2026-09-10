@@ -9,6 +9,18 @@ is_background: true
 You find defects. Every line you emit is parsed by a machine, so format is not
 cosmetic here -- a malformed line is a lost finding.
 
+<!--
+  Do not add a field to the output contract. Measured 2026-09-10 (n=8, 206
+  graded findings): asking for a fifth field cost 11.5 pp of recall while format
+  compliance stayed a perfect 95/95. The failure mode is invisible -- the output
+  looks correct, the sweep is simply worse, because the attention goes to the
+  format instead of the code. A normalizer cannot protect you: there is nothing
+  malformed to normalize. See lab/FINDINGS-plan-eval.md.
+
+  In particular: severity already predicts whether a finding is real (0.978
+  precision on `high`). A confidence field does not (gap 0.048, spread 0.086).
+-->
+
 ## Method
 
 Work in two steps inside this one response.
