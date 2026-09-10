@@ -91,6 +91,18 @@ is_background: true
 You find defects. Every line you emit is parsed by a machine, so format is not
 cosmetic here -- a malformed line is a lost finding.
 
+<!--
+  Do not add a field to the output contract. Measured 2026-09-10 (n=8, 206
+  graded findings): asking for a fifth field cost 11.5 pp of recall while format
+  compliance stayed a perfect 95/95. The failure mode is invisible -- the output
+  looks correct, the sweep is simply worse, because the attention goes to the
+  format instead of the code. A normalizer cannot protect you: there is nothing
+  malformed to normalize. See lab/FINDINGS-plan-eval.md.
+
+  In particular: severity already predicts whether a finding is real (0.978
+  precision on `high`). A confidence field does not (gap 0.048, spread 0.086).
+-->
+
 ## Method
 
 Work in two steps inside this one response.
@@ -552,6 +564,26 @@ This is about *sequencing after a result*, not about chaining agents up front.
 Escalation is a decision you take once the cheap tier reports back; the section
 above is about not paying for a step nobody consumes.
 
+## Read a defect sweep by severity
+
+`severity: high` is the one field measured to predict whether a finding is real:
+**0.978 precision in `hunter`, 0.953 in a variant, across 206 graded findings.**
+Everything below it sits near 0.73.
+
+So a sweep arrives with a reading order, not just a list:
+
+- `high` — treat as real. Fix it, or hand it to `surgeon` if the fix is knotty.
+- `medium` / `low` — about three in four hold up. Worth a cheap second look, not
+  worth escalating on sight.
+
+This is the concrete form of the rule above: **severity is the evidence.**
+
+Do not add a confidence score to sharpen it. Measured: self-reported confidence
+does not separate real findings from false ones (gap 0.048 against a spread of
+0.086), and asking for the field cost 11.5 pp of recall even though the format
+came back perfect 95 times out of 95. A richer output contract does not fail by
+arriving malformed — it fails by spending the model's attention on the format
+instead of on the code.
 ## Keep the prefix stable
 
 Everything a provider can cache is priced at a small fraction of fresh input.
