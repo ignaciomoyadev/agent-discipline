@@ -2,7 +2,8 @@
 
 Harness personal para Cursor: contrato de salida, flota de subagentes anclada por
 coste, y guía de enrutado. **Cada afirmación de aquí está medida**, no supuesta —
-las mediciones son del 2026-09-08, sobre un fixture con defectos plantados.
+las mediciones son del 2026-09-08 y del 2026-09-10, sobre un fixture con defectos
+plantados. Cuando una medición nueva desmiente una vieja, se dice cuál y por qué.
 
 ## Instalar
 
@@ -40,30 +41,59 @@ porque se cobra en cada turno de cada sesión.
 Escalar por evidencia, mantener estable el prefijo cacheable, descargar a disco
 en vez de truncar.
 
-## Las cuatro cosas medidas que explican el diseño
+## Las siete cosas medidas que explican el diseño
 
-**1. El andamiaje del rol le gana a añadir agentes, por un orden de magnitud.**
-Andamiar un agente único subió el recall +28 pp; añadir agentes lo movió entre 0
-y −16.6 pp. Y el prompt malo era **el más caro**: no hace escribir más, hace
-buscar más.
+**1. El andamiaje del rol es la palanca grande.** Andamiar un agente único subió
+el recall +26.6 pp. Y el prompt malo era **el más caro**: no hace escribir más,
+hace buscar más.
 
 **2. El andamiaje depende de la capacidad del modelo.** El mismo texto dio +6.7 pp
 en Composer, 0 en Opus y **−11 pp en Grok**. Por eso `surgeon` no lleva checklist
 y `hunter` sí. No copies el patrón de uno al otro sin medir.
 
-**3. Podar destruye.** Un verificador usado como puerta bajó el recall de 0.916 a
-0.750, y un orquestador filtrando de 0.778 a 0.611 — el modelo *más* potente
-borró *más*, incluido un defecto inequívoco de severidad alta en las tres
-corridas. Por eso `auditor` anota y no elimina.
+**3. Podar destruye — y fusionar también.** Un verificador usado como puerta bajó
+el recall de 0.916 a 0.750, y un orquestador filtrando de 0.778 a 0.611: el
+modelo *más* potente borró *más*. Por eso `auditor` anota y no elimina. Y al
+unir varios agentes, toda clave de similitud que comprime la unión pierde
+defectos; la única que no pierde ninguno no fusiona nada. Dos defectos distintos
+en el mismo símbolo son léxicamente indistinguibles de una repetición.
 
 **4. Lo determinista le gana a lo pedido.** Un contrato de salida por prompt logró
 0% de cumplimiento; el mismo criterio en código, 100%.
 
+**5. `severity: high` es la evidencia.** Acierta el 96% de las veces sobre 206
+hallazgos; todo lo demás ronda el 73%. Una barrida llega con orden de lectura, no
+solo con lista. Pedir además un campo de confianza no discrimina nada (0.894
+contra 0.846, con dispersión 0.086) y cuesta **11.5 pp de recall** — con el
+formato saliendo perfecto 95 veces de 95. Un contrato más rico no falla por salir
+mal formado: falla por llevarse la atención del código al formato.
+
+**6. Un ensemble compra varianza, no reparto de trabajo.** Tres `hunter`
+idénticos, unión sin borrar nada, agrupada por `file::symbol`: **0.95 de recall
+contra 0.80** de uno solo, fiable 10 de 10 corridas contra 4 de 10, por 14.5
+unidades de lectura contra 11.5. Darles superficies distintas no ayuda aunque se
+especialicen (y se especializan: 0.925 en la propia, ~0.07 en las ajenas) —
+cada superficie se vuelve un punto único de fallo. La versión anterior de este
+README decía que añadir agentes movía el recall "entre 0 y −16.6 pp"; el −16.6
+era del brazo que poda, y el resto era un artefacto de la función de unión, que
+colapsaba dos defectos distintos del mismo símbolo en uno.
+
+**7. El kernel comprime, no mejora.** Recall idéntico a tres decimales con y sin
+él; la salida baja un **20%** (t = 2.74, p < 0.05). Vive en el prefijo cacheado,
+así que es una rebaja gratis sobre el componente más caro de la factura — poco
+en Composer, bastante en cualquier modelo de la bolsa de créditos.
+
 ## Anclar el modelo: la trampa
 
-Un slug pelado no basta. Con `model: composer-2.5` la interfaz resuelve a
-**Composer 2.5 Fast** — $3/$15 por millón en vez de $0.50/$2.50, unas 6x. Fast es
-el tier por defecto en Pro y superiores.
+Un slug pelado no basta **en la interfaz**. Con `model: composer-2.5` el selector
+resuelve a **Composer 2.5 Fast** — $3/$15 por millón en vez de $0.50/$2.50, unas
+6x. Fast es el tier por defecto en Pro y superiores.
+
+En el CLI es al revés: `composer-2.5` y `composer-2.5-fast` son slugs separados
+en `--list-models`, y el pelado se comporta como no-Fast. Y `[fast=false]` **se
+honra**: sale un 33% más lento que `composer-2.5-fast` (t = 3.08). Un modelo que
+se autorreporta como Fast no es evidencia de nada — no sabe su tier, y el
+envelope del CLI no lleva campo de modelo con el que contrastarlo.
 
 Y cada familia usa sintaxis distinta:
 
@@ -78,8 +108,16 @@ resuelto.
 ## Lo que este diseño no sabe
 
 Un fixture, tres archivos, defectos plantados a mano — menos representativos que
-los reales. n entre 2 y 5, cuando hacen falta ~9 corridas para detectar 2 pp.
-`builder` y `surgeon` nunca se midieron: su andamiaje es analogía, no resultado.
+los reales. n entre 8 y 10 en lo medido el 2026-09-10, entre 2 y 5 en lo
+anterior. `builder` y `surgeon` nunca se midieron: su andamiaje es analogía, no
+resultado. `researcher` no se ha comparado entre Composer y Grok.
+
+El ensemble agrupado (punto 6) está medido pero no empaquetado como comando. Y
+el agregador que fusionara repeticiones sin perder defectos no existe: se barrió
+el espacio de umbrales y no hay ninguno que lo consiga.
+
+El pin `[fast=false]` está verificado por CLI, no por la ruta de subagentes de la
+interfaz, que es otro código.
 
 Los hooks quedaron fuera a propósito: se registran pero no se ejecutan en
 `cursor-agent` 2026.09.02, comprobado en IDE y CLI.
