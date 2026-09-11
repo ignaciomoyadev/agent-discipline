@@ -30,21 +30,25 @@ Cinco líneas que mandan localizar a `scout` y barrer defectos a `hunter`. Está
 aquí, y no en la skill, porque se midió (punto 8): la skill de enrutado produjo
 **0 de 8** delegaciones; esta regla, **8 de 8**. Lo que importa no se deja al 58%.
 
-### `agents/` — siete roles de producción
+### `agents/` — siete especializados + dos flexibles
 
-| rol | modelo | modo | escribe |
+| rol | modelo | escribe | forma |
 |---|---|---|---|
-| `scout` | `composer-2.5[fast=false]` | 1er plano | no |
-| `hunter` | `composer-2.5[fast=false]` | 1er plano | no |
-| `builder` | `composer-2.5[fast=false]` | 1er plano | **sí** |
-| `auditor` | `composer-2.5[fast=false]` | 1er plano | no |
-| `scribe` | `composer-2.5[fast=false]` | 1er plano | no |
-| `researcher` | `grok-4.6[effort=medium,fast=false]` | 1er plano | no |
-| `surgeon` | `grok-4.6[effort=xhigh,fast=false]` | 1er plano | **sí** |
+| `scout` | `composer-2.5[fast=false]` | no | localizar |
+| `hunter` | `composer-2.5[fast=false]` | no | barrer defectos |
+| `builder` | `composer-2.5[fast=false]` | **sí** | implementar diseño fijado |
+| `auditor` | `composer-2.5[fast=false]` | no | verificar/refutar |
+| `scribe` | `composer-2.5[fast=false]` | no | comprimir |
+| `researcher` | `grok-4.6[effort=medium,fast=false]` | no | docs/web externas |
+| `surgeon` | `grok-4.6[effort=xhigh,fast=false]` | **sí** | bug difícil |
+| `investigator` | `composer-2.5[fast=false]` | no | **investigar lo que sea** (flexible) |
+| `implementer` | `composer-2.5[fast=false]` | **sí** | **construir lo que sea** (flexible) |
 
 Todos en primer plano: por la ruta del CLI, `is_background: true` no devuelve
-nada — el task tool responde vacío y el principal se queda esperando en awaits
-ciegos (punto 9).
+nada (punto 9). Los dos flexibles son agnósticos de dominio: el orquestador les
+da la forma en el brief. Específicos de disciplina (readonly/escribe, contrato,
+verificación), generales de tarea — así conservan el andamiaje que mide bien sin
+atarse a un dominio.
 
 ### `skills/token-discipline/` — la tabla completa de enrutado
 
@@ -67,7 +71,20 @@ test-primero al arreglar, construir-y-cubrir al crear. Medida (puntos 11-13): te
 válido en el 100% de los cambios en bugfix y greenfield, sin testear interfaces
 inexistentes, ~+20% de tiempo. Actívala por repo, ver `optional-rules/README.md`.
 
-## Las nueve cosas medidas que explican el diseño
+### `commands/orchestrate.md` — planifica y delega (invocado)
+
+Preámbulo de orquestación: planifica, delega cada paso al subagente adecuado,
+integra, decide. Medido (punto 14): una **regla** siempre activa de "sé
+orquestador" no induce delegación (**0/6**); el mismo texto **explícito** en el
+prompt la induce siempre (**6/6**). Por eso es un command que invocas, no una
+regla ambiente. Instálalo por repo (`.cursor/commands/`) o global
+(`~/.cursor/commands/`) — `plugin.json` no declara `commands/`, así que no se
+auto-carga.
+
+Expectativa medida: delega un paso de investigación, no un ejército. El fan-out
+amplio depende del modelo orquestador (Opus sin medir).
+
+## Las diez cosas medidas que explican el diseño
 
 **1. El andamiaje del rol es la palanca grande.** Andamiar un agente único subió
 el recall +26.6 pp. Y el prompt malo era **el más caro**: no hace escribir más,
@@ -121,6 +138,14 @@ vacío, los `await` vuelven con cero bytes, y el principal acaba leyendo el
 transcript del subagente del disco: 195 s y 5x los tokens. Con `false`: una
 llamada, 39 s, resultado por la vía normal. Toda la flota pasó a primer plano.
 No medido en la ruta de subagentes de la UI, que es otro código.
+
+**10. Orquestar se pide, no se ambienta.** Una regla siempre activa de "sé
+orquestador, planifica y delega" no indujo delegación (**0/6**, y hasta hizo más
+trabajo propio). El mismo texto explícito en el prompt: **6/6**. Es el patrón del
+punto 8 llevado al límite — lo abierto por regla no se cumple; lo concreto y
+explícito sí. Por eso la orquestación es un command (`/orchestrate`), no una
+regla. Y aun pedida, Composer delega **un** paso, no un fan-out: repartir de
+verdad puede exigir un orquestador más capaz (Opus, sin medir).
 
 ## Anclar el modelo: la trampa
 

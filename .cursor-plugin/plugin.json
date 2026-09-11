@@ -1,7 +1,7 @@
 {
   "name": "agent-discipline",
   "displayName": "Agent Discipline",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Output contract and routing guidance, plus the agent fleet as source. Measured, not assumed.",
   "author": {
     "name": "Ignacio Moya"
