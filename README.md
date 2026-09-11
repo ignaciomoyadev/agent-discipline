@@ -2,7 +2,7 @@
 
 Harness personal para Cursor: contrato de salida, flota de subagentes anclada por
 coste, y guía de enrutado. **Cada afirmación de aquí está medida**, no supuesta —
-las mediciones son del 2026-09-08 y del 2026-09-10, sobre un fixture con defectos
+las mediciones son del 2026-09-08 al 2026-09-11, sobre un fixture con defectos
 plantados. Cuando una medición nueva desmiente una vieja, se dice cuál y por qué.
 
 ## Instalar
@@ -19,29 +19,41 @@ redescarga).
 
 ## Qué trae
 
-### `rules/core.mdc` — la única regla siempre activa
+### `rules/core.mdc` — contrato de salida, siempre activa
 
 Contrato de salida, honestidad en la verificación, control de alcance. 20 líneas,
 porque se cobra en cada turno de cada sesión.
+
+### `rules/route.mdc` — enrutar a la flota, siempre activa
+
+Cinco líneas que mandan localizar a `scout` y barrer defectos a `hunter`. Está
+aquí, y no en la skill, porque se midió (punto 8): la skill de enrutado produjo
+**0 de 8** delegaciones; esta regla, **8 de 8**. Lo que importa no se deja al 58%.
 
 ### `agents/` — siete roles de producción
 
 | rol | modelo | modo | escribe |
 |---|---|---|---|
 | `scout` | `composer-2.5[fast=false]` | 1er plano | no |
-| `hunter` | `composer-2.5[fast=false]` | fondo | no |
+| `hunter` | `composer-2.5[fast=false]` | 1er plano | no |
 | `builder` | `composer-2.5[fast=false]` | 1er plano | **sí** |
 | `auditor` | `composer-2.5[fast=false]` | 1er plano | no |
-| `scribe` | `composer-2.5[fast=false]` | fondo | no |
-| `researcher` | `grok-4.6[effort=medium,fast=false]` | fondo | no |
+| `scribe` | `composer-2.5[fast=false]` | 1er plano | no |
+| `researcher` | `grok-4.6[effort=medium,fast=false]` | 1er plano | no |
 | `surgeon` | `grok-4.6[effort=xhigh,fast=false]` | 1er plano | **sí** |
 
-### `skills/token-discipline/` — cómo enrutar
+Todos en primer plano: por la ruta del CLI, `is_background: true` no devuelve
+nada — el task tool responde vacío y el principal se queda esperando en awaits
+ciegos (punto 9).
 
-Escalar por evidencia, mantener estable el prefijo cacheable, descargar a disco
-en vez de truncar.
+### `skills/token-discipline/` — la tabla completa de enrutado
 
-## Las siete cosas medidas que explican el diseño
+Qué tier merece cada tarea, escalar por evidencia (`severity: high`), no encadenar
+un agente que ya abre archivos, prefijo cacheable estable, descargar a disco en
+vez de truncar. El disparo de las dos rutas comunes vive en `route.mdc`; esto es
+el detalle que se consulta, no la orden que se ejecuta.
+
+## Las nueve cosas medidas que explican el diseño
 
 **1. El andamiaje del rol es la palanca grande.** Andamiar un agente único subió
 el recall +26.6 pp. Y el prompt malo era **el más caro**: no hace escribir más,
@@ -82,6 +94,19 @@ colapsaba dos defectos distintos del mismo símbolo en uno.
 él; la salida baja un **20%** (t = 2.74, p < 0.05). Vive en el prefijo cacheado,
 así que es una rebaja gratis sobre el componente más caro de la factura — poco
 en Composer, bastante en cualquier modelo de la bolsa de créditos.
+
+**8. El enrutado va en una regla, no en la skill.** Con la skill `token-discipline`
+como única guía, el agente principal delegó **0 de 8** veces — hizo la barrida a
+mano, con 8 comandos shell y 4.5x más tokens en su propio contexto. Con una regla
+`alwaysApply` de cinco líneas: **8 de 8**, al subagente correcto. La skill se
+activa el 58% y su tabla vive en el párrafo cuarto de un documento de economía;
+la orden corta y siempre activa es lo que dispara.
+
+**9. `is_background: true` no devuelve nada por CLI.** El task tool responde
+vacío, los `await` vuelven con cero bytes, y el principal acaba leyendo el
+transcript del subagente del disco: 195 s y 5x los tokens. Con `false`: una
+llamada, 39 s, resultado por la vía normal. Toda la flota pasó a primer plano.
+No medido en la ruta de subagentes de la UI, que es otro código.
 
 ## Anclar el modelo: la trampa
 

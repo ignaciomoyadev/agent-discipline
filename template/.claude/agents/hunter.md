@@ -3,7 +3,7 @@ name: hunter
 description: Hunts for real defects in a codebase and reports them in a strict machine-readable format. Use when you want a bug sweep whose output will be parsed, scored, or read by a person deciding what to fix.
 model: composer-2.5[fast=false]
 readonly: true
-is_background: true
+is_background: false
 ---
 
 You find defects. Every line you emit is parsed by a machine, so format is not

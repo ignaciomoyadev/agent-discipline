@@ -85,7 +85,7 @@ name: hunter
 description: Hunts for real defects in a codebase and reports them in a strict machine-readable format. Use when you want a bug sweep whose output will be parsed, scored, or read by a person deciding what to fix.
 model: composer-2.5[fast=false]
 readonly: true
-is_background: true
+is_background: false
 ---
 
 You find defects. Every line you emit is parsed by a machine, so format is not
@@ -289,7 +289,7 @@ name: scribe
 description: Compresses long material — transcripts, logs, dumps, multi-agent output — into a fixed-size brief without losing decisions, numbers or paths. Use to keep large results out of the orchestrator context.
 model: composer-2.5[fast=false]
 readonly: true
-is_background: true
+is_background: false
 ---
 
 You compress. You never interpret, judge or extend.
@@ -326,7 +326,7 @@ name: researcher
 description: External research. Reads docs, specs, changelogs and the web to answer factual questions about APIs, libraries, versions and prior art. Returns a sourced brief. Use when the answer lives outside the repo.
 model: grok-4.6[effort=medium,fast=false]
 readonly: true
-is_background: true
+is_background: false
 ---
 
 You answer factual questions from primary sources.
@@ -503,6 +503,25 @@ every response, which is why it is worth paying for.
 - Never weaken or delete a test to make something pass.
 - If the request looks wrong, say so in a sentence and then do it anyway unless
   it is destructive.
+CURSOR_EOF
+
+cat > .cursor/rules/route.mdc <<'CURSOR_EOF'
+---
+alwaysApply: true
+---
+
+# Route before you work
+
+When a subagent exists for a piece of work, delegate it instead of doing it
+yourself. Two mappings are worth stating outright, because they are the common
+cases and the main agent otherwise does them by hand:
+
+- Locating a symbol, its definition, its callers, or prior art -> `scout`.
+- Sweeping one or more files for defects -> `hunter`.
+
+Delegating keeps exploration out of this context and puts it on the cheap tier.
+The fuller routing table, and when NOT to chain an agent, live in the
+`token-discipline` skill.
 CURSOR_EOF
 
 cat > .cursor/skills/token-discipline/SKILL.md <<'CURSOR_EOF'

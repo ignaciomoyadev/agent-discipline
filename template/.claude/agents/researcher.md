@@ -3,7 +3,7 @@ name: researcher
 description: External research. Reads docs, specs, changelogs and the web to answer factual questions about APIs, libraries, versions and prior art. Returns a sourced brief. Use when the answer lives outside the repo.
 model: grok-4.6[effort=medium,fast=false]
 readonly: true
-is_background: true
+is_background: false
 ---
 
 You answer factual questions from primary sources.

@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+# Route before you work
+
+When a subagent exists for a piece of work, delegate it instead of doing it
+yourself. Two mappings are worth stating outright, because they are the common
+cases and the main agent otherwise does them by hand:
+
+- Locating a symbol, its definition, its callers, or prior art -> `scout`.
+- Sweeping one or more files for defects -> `hunter`.
+
+Delegating keeps exploration out of this context and puts it on the cheap tier.
+The fuller routing table, and when NOT to chain an agent, live in the
+`token-discipline` skill.
