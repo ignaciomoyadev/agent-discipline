@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+# Cover every change with a test
+
+Every change ships with a test that exercises it. How depends on the change:
+
+- Fixing a defect or changing existing behaviour: write the test FIRST -
+  reproduce the fault, watch it fail, then change the code until it passes.
+- Building something new (a module or function that does not exist yet):
+  implement it, then leave it covered by tests that pass. Do NOT write tests
+  against an interface you have not designed yet.
+
+A change without a test that exercises it is not finished. Never write a stub
+test just to satisfy this rule.

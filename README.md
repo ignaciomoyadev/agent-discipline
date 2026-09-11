@@ -53,6 +53,20 @@ un agente que ya abre archivos, prefijo cacheable estable, descargar a disco en
 vez de truncar. El disparo de las dos rutas comunes vive en `route.mdc`; esto es
 el detalle que se consulta, no la orden que se ejecuta.
 
+### `skills/change-docs/` — traza de cambios no obvios
+
+Árbol `docs/` (plans, solutions, decisions, migration, security) y la disciplina
+de cuándo documentar. Agnóstica de stack: para reglas de un dominio concreto,
+añade una skill de ese repo. Es la versión general de un `odoo-change-docs`, sin
+lo específico de Odoo.
+
+### `optional-rules/tdd.mdc` — cubre cada cambio con un test (opcional)
+
+No se carga sola (`plugin.json` solo declara `rules/`). Regla condicional:
+test-primero al arreglar, construir-y-cubrir al crear. Medida (puntos 11-13): test
+válido en el 100% de los cambios en bugfix y greenfield, sin testear interfaces
+inexistentes, ~+20% de tiempo. Actívala por repo, ver `optional-rules/README.md`.
+
 ## Las nueve cosas medidas que explican el diseño
 
 **1. El andamiaje del rol es la palanca grande.** Andamiar un agente único subió
